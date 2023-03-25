@@ -3,18 +3,31 @@ require "rtesseract"
 
 class CoordinatesExtractor
   def initialize(args = {})
+    # TODOs:
+    # - Receive tesseract config file as arg.
+    # - Receive image extension as arg.
+
     @video_paths = [args[:video_path]]
     @images_extension = "jpg"
   end
 
   def run
+    # TODOs:
+    # - Create a hash with coordinates as keys and image_path and image_text as values.
+    # - The first image is duplicated, delete duplicate coordinates.
+    # - Generate text files:
+    #   - One per each image containing the coordinates, or NOT FOUND.
+    #   - One with all the information collected per image.
+
     begin
       @video_paths.each do |video_path|
         images_dir = extract_images_per_second(video_path)
 
         images = get_images_list(images_dir)
         images.each do |image_path|
-          coordinates = extract_coordinates(image_path)
+          image_text = extract_text(image_path)
+          coordinates = extract_coordinates(image_text)
+          puts "** #{image_path} coordinates: #{coordinates} ===(#{image_text})==="
         end
       end
     rescue => err
@@ -24,6 +37,9 @@ class CoordinatesExtractor
   end
 
   def extract_images_per_second(video_path)
+    # TODOs:
+    # - Avoid generating images if they are already present.
+
     begin
       images_dir = create_images_dir(video_path)
       video = FFMPEG::Movie.new(video_path)
@@ -48,13 +64,50 @@ class CoordinatesExtractor
     end
   end
 
-  def extract_coordinates(image_path)
-    # TODO: checkout the tesseract help for a more accurate extraction.
-    # TODO: look at page segmentation modes.
-    # TODO: look at user patterns dir.
-    image_text = RTesseract.new(image_path, config_file: "digits quiet").to_s.strip
+  def extract_text(image_path)
+    begin
+      RTesseract.new(
+        image_path, config_file: "./config/tesseract.config"
+      ).to_s.strip
+    rescue => err
+      STDERR.puts("Error extracting text for image: #{iamge_path}.\n#{err}")
+      raise err
+    end
+  end
 
-    puts "** #{image_path} coordinates: #{match_coordinates(image_text)} ===(#{image_text})==="
+  def extract_coordinates(text)
+    # TODOs:
+    # - For string: "10.2542 6.23891 -75.03825", it matches: "10.2542 6.23891"
+    #   - Look ahead and make sure only one match follows.
+    # - For string: "6.23907 -181.03824", it matches: "6.23907 81.03824"
+    #   - Ensure there are no digits before the first digit, \D maybe.
+
+    coordinates_match = text.match(%r{
+      # Latitude.
+      # Number between -90 and 90 with 6 decimals maximum.
+      (?<latitude>
+        [+-]?
+        (?:
+          90(?:\.\d{1,6})          # match 90.######
+          |                        # or
+          [1-8]?\d(?:\.\d{1,6})    # number less than 90 with .######
+        )
+      )
+      \s+
+      # Longitude.
+      # Number between -180 and 180 with 6 decimals maximum.
+      (?<longitude>
+        [+-]?
+        (?:
+          180(?:\.\d{1,6})                # match 180.######
+          |                               # or
+          (?:\d|1[0-7])?\d(?:\.\d{1,6})   # number less than 180 with .######
+        )
+      )
+    }x)
+
+    return [] if coordinates_match.nil?
+    return coordinates_match[:latitude], coordinates_match[:longitude]
   end
 
 private
@@ -69,12 +122,5 @@ private
 
   def get_images_list(images_dir)
     Dir["#{images_dir}/*.#{@images_extension}"]
-  end
-
-  def match_coordinates(text)
-    # TODO: use a multiline regex and add comments.
-    # TODO: tune the regex to prefer the numbers with dot.
-    # TODO: the space in the beginning might not exist.
-    text.match(/(\s+|^)((\-?|\+?)?\d+(\.\d+)?)\s((\-?|\+?)?\d+(\.\d+)?)/)
   end
 end
