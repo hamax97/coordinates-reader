@@ -46,7 +46,7 @@ class CoordinatesExtractor
       video.screenshot(
         "#{images_dir}/%06d.#{@images_extension}",
         {
-          # if using only the duration in seconds for vframes there might be
+          # if using the exact duration in seconds for vframes there might be
           # some frames at the end of the video that are not captured, so,
           # multiplying by two will always include all the number of frames
           # required and will not fail if more frames than the existing ones
@@ -81,6 +81,7 @@ class CoordinatesExtractor
     #   - Look ahead and make sure only one match follows.
     # - For string: "6.23907 -181.03824", it matches: "6.23907 81.03824"
     #   - Ensure there are no digits before the first digit, \D maybe.
+    # - It matches only floating point values, not integers.
 
     coordinates_match = text.match(%r{
       # Latitude.
