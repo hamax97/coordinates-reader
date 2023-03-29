@@ -26,6 +26,8 @@ Tested with:
 - Tesseract version 4.1.1
 - FFMPEG version 4.2.7-0ubuntu0.1
 - Ruby version 3.2.0
+- SQLite 3 - 3.31.1
+- Rails
 
 # How to Use
 
