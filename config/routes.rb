@@ -3,4 +3,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
+
+  get "videos", to: "videos#extract_coordinates"
+  post "videos", to: "videos#upload"
 end

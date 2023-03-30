@@ -1,0 +1,7 @@
+<h1>Videos#upload</h1>
+<p>Find me in app/views/videos/upload.html.erb</p>
+
+<%= form_with model: @video do |form| %>
+  <%= form.file_field :video_file %>
+  <%= form.submit %>
+<% end %>
