@@ -38,6 +38,7 @@ class CoordinatesExtractor
 
   def extract_images_per_second(video_path)
     # TODOs:
+    # - Redirect the output of this command to a log file.
     # - Avoid generating images if they are already present.
 
     begin
@@ -70,7 +71,7 @@ class CoordinatesExtractor
         image_path, config_file: "./config/tesseract.config"
       ).to_s.strip
     rescue => err
-      STDERR.puts("Error extracting text for image: #{iamge_path}.\n#{err}")
+      STDERR.puts("Error extracting text for image: #{image_path}.\n#{err}")
       raise err
     end
   end
