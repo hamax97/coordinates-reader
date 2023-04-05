@@ -1,1 +1,1 @@
-require "core.rb"
+require_relative "core.rb"

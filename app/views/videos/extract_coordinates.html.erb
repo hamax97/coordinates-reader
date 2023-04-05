@@ -1,9 +1,15 @@
 <h1>Extract coordinates</h1>
 <p>Select video</p>
 
-<%= form_with model: Video.new do |form| %>
+<%= form_with model: @video do |form| %>
+
   <%= form.file_field :video_file %>
   <%= form.submit %>
+
+  <% @video.errors.full_messages_for(:name).each do |message| %>
+    <div><%= message %></div>
+  <% end %>
+
 <% end %>
 
 <br>

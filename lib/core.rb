@@ -1,14 +1,14 @@
 require "streamio-ffmpeg"
 require "rtesseract"
 
+require_relative "exceptions.rb"
+
 class CoordinatesExtractor
   def initialize(args = {})
-    # TODOs:
-    # - Receive tesseract config file as arg.
-    # - Receive image extension as arg.
-
-    @video_paths = [args[:video_path]]
+    @video_path = args[:video_path]
     @images_extension = "jpg"
+    @image_naming_pattern = "%06d.#{@images_extension}" # see ffmpeg's file numbering.
+    @tesseract_config_file = "./config/tesseract.config"
   end
 
   def run
@@ -20,32 +20,37 @@ class CoordinatesExtractor
     #   - One with all the information collected per image.
 
     begin
-      @video_paths.each do |video_path|
-        images_dir = extract_images_per_second(video_path)
+      video_coordinates = {}
 
-        images = get_images_list(images_dir)
-        images.each do |image_path|
-          image_text = extract_text(image_path)
-          coordinates = extract_coordinates(image_text)
-          puts "** #{image_path} coordinates: #{coordinates} ===(#{image_text})==="
-        end
+      images_dir = extract_images_per_second(@video_path, @image_naming_pattern)
+      images = get_images_list(images_dir)
+      images.each do |image_path|
+        image_text = extract_text(image_path)
+        coordinates = extract_coordinates(image_text)
+
+        video_coordinates[image_path] = {
+          coordinates: coordinates,
+          image_text: image_text
+        }
       end
+
+      video_coordinates
     rescue => err
-      STDERR.puts("Error in processing: #{err}")
-      exit
+      raise CoordinatesExtractionError, err
     end
   end
 
-  def extract_images_per_second(video_path)
+  def extract_images_per_second(video_path, naming_pattern)
     # TODOs:
     # - Redirect the output of this command to a log file.
     # - Avoid generating images if they are already present.
 
+    images_dir = create_images_dir(video_path)
+
     begin
-      images_dir = create_images_dir(video_path)
       video = FFMPEG::Movie.new(video_path)
       video.screenshot(
-        "#{images_dir}/%06d.#{@images_extension}",
+        "#{images_dir}/#{naming_pattern}",
         {
           # if using the exact duration in seconds for vframes there might be
           # some frames at the end of the video that are not captured, so,
@@ -58,21 +63,18 @@ class CoordinatesExtractor
         validate: false
       )
 
-      return images_dir
+      images_dir
     rescue => err
-      STDERR.puts("Error extracting images for video: #{video_path}.\n#{err}")
-      raise err
+      delete_images_dir(images_dir)
+      raise CoordinatesExtractionError, "Error extracting images for video: #{video_path}. #{err}"
     end
   end
 
   def extract_text(image_path)
     begin
-      RTesseract.new(
-        image_path, config_file: "./config/tesseract.config"
-      ).to_s.strip
+      RTesseract.new(image_path, config_file: @tesseract_config_file).to_s.strip
     rescue => err
-      STDERR.puts("Error extracting text for image: #{image_path}.\n#{err}")
-      raise err
+      raise CoordinatesExtractionError, "Error extracting text for image: #{image_path}. #{err}"
     end
   end
 
@@ -81,6 +83,7 @@ class CoordinatesExtractor
     # - For string: "10.2542 6.23891 -75.03825", it matches: "10.2542 6.23891"
     #   - Look ahead and make sure only one match follows.
     # - For string: "6.23907 -181.03824", it matches: "6.23907 81.03824"
+    #   - Longitudes of more than 180 are not valid coordinates.
     #   - Ensure there are no digits before the first digit, \D maybe.
     # - It matches only floating point values, not integers.
 
@@ -92,7 +95,7 @@ class CoordinatesExtractor
         (?:
           90(?:\.\d{1,6})          # match 90.######
           |                        # or
-          [1-8]?\d(?:\.\d{1,6})    # number less than 90 with .######
+          [1-8]?\d(?:\.\d{1,6})    # number less than 90 ending with .######
         )
       )
       \s+
@@ -103,7 +106,7 @@ class CoordinatesExtractor
         (?:
           180(?:\.\d{1,6})                # match 180.######
           |                               # or
-          (?:\d|1[0-7])?\d(?:\.\d{1,6})   # number less than 180 with .######
+          (?:\d|1[0-7])?\d(?:\.\d{1,6})   # number less than 180 endint with .######
         )
       )
     }x)
@@ -120,6 +123,10 @@ private
     end
 
     dir
+  end
+
+  def delete_images_dir(images_dir)
+    FileUtils.remove_dir(images_dir, force = true) if Dir.exist?(images_dir)
   end
 
   def get_images_list(images_dir)
