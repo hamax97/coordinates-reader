@@ -1,5 +1,5 @@
-<h1>Videos#upload</h1>
-<p>Find me in app/views/videos/upload.html.erb</p>
+<h1>Extract coordinates</h1>
+<p>Select video</p>
 
 <%= form_with model: Video.new do |form| %>
   <%= form.file_field :video_file %>
@@ -9,6 +9,8 @@
 <br>
 
 <h1>Videos processed</h1>
+<ul>
 <% @videos_processed.each do |video| %>
-  - <%= video %>
+  <li><%= video %></li>
 <% end %>
+</ul>
