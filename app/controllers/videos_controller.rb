@@ -16,6 +16,10 @@ class VideosController < ApplicationController
       video_coordinates = CoordinatesExtractor.new(video_path: video_file.path).run
 
       # TODO: save images. Before or after video? What if something happens? How to rollback?
+      # TODO:
+      # - Read: https://guides.rubyonrails.org/active_storage_overview.html#attaching-file-io-objects
+      # @video.images.create(): should work now.
+      # @video.destroy: should delete video and images.
 
       @video = Video.new(name: video_file.original_filename, size: get_video_size(video_file))
       if @video.save
