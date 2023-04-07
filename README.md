@@ -19,6 +19,7 @@ sudo apt install tesseract-ocr libtesseract-dev
 ```bash
 sudo apt install tesseract-ocr libtesseract-dev
 sudo apt install ffmpeg
+ sudo apt install libvips42 # required for gem image_processing, required for displaying images.
 ```
 
 Tested with:
@@ -30,6 +31,15 @@ Tested with:
 - Rails
 
 # How to Use
+
+## Setup app
+
+```
+bin/rails db:migrate
+bin/rails active_storage:install
+```
+
+## Run
 
 Run:
 

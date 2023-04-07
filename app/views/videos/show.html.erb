@@ -1,0 +1,11 @@
+<h1>Videos processed</h1>
+<ul>
+<% @videos_processed.each do |video| %>
+  <li>
+    <%= "#{video.name} - #{video.size}" %>
+    <% video.images.each do |image| %>
+      <%= image_tag image.image_file.representation({resize_to_limit: [100, 100]}) %>
+    <% end %>
+  </li>
+<% end %>
+</ul>

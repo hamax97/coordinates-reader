@@ -2,14 +2,8 @@
 <p>Select video</p>
 
 <%= form_with model: @video do |form| %>
-
   <%= form.file_field :video_file %>
   <%= form.submit %>
-
-  <% @video.errors.full_messages_for(:name).each do |message| %>
-    <div><%= message %></div>
-  <% end %>
-
 <% end %>
 
 <br>
@@ -17,6 +11,6 @@
 <h1>Videos processed</h1>
 <ul>
 <% @videos_processed.each do |video| %>
-  <li><%= video %></li>
+  <li><%= "#{video.name} - #{video.size}" %></li>
 <% end %>
 </ul>

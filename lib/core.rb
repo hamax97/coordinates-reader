@@ -4,21 +4,17 @@ require "rtesseract"
 require_relative "exceptions.rb"
 
 class CoordinatesExtractor
+
+  attr_reader :image_extension
+
   def initialize(args = {})
     @video_path = args[:video_path]
-    @images_extension = "jpg"
-    @image_naming_pattern = "%06d.#{@images_extension}" # see ffmpeg's file numbering.
+    @image_extension = "jpeg"
+    @image_naming_pattern = "%06d.#{@image_extension}" # see ffmpeg's file numbering.
     @tesseract_config_file = "./config/tesseract.config"
   end
 
   def run
-    # TODOs:
-    # - Create a hash with coordinates as keys and image_path and image_text as values.
-    # - The first image is duplicated, delete duplicate coordinates.
-    # - Generate text files:
-    #   - One per each image containing the coordinates, or NOT FOUND.
-    #   - One with all the information collected per image.
-
     begin
       video_coordinates = {}
 
@@ -41,7 +37,7 @@ class CoordinatesExtractor
   end
 
   def extract_images_per_second(video_path, naming_pattern)
-    # TODOs:
+    # TODO:
     # - Redirect the output of this command to a log file.
     # - Avoid generating images if they are already present.
 
@@ -79,7 +75,7 @@ class CoordinatesExtractor
   end
 
   def extract_coordinates(text)
-    # TODOs:
+    # TODO:
     # - For string: "10.2542 6.23891 -75.03825", it matches: "10.2542 6.23891"
     #   - Look ahead and make sure only one match follows.
     # - For string: "6.23907 -181.03824", it matches: "6.23907 81.03824"
@@ -130,6 +126,6 @@ private
   end
 
   def get_images_list(images_dir)
-    Dir["#{images_dir}/*.#{@images_extension}"]
+    Dir["#{images_dir}/*.#{@image_extension}"]
   end
 end
