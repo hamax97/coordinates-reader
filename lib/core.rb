@@ -5,21 +5,27 @@ require_relative "exceptions.rb"
 
 class CoordinatesExtractor
 
-  attr_reader :image_extension
+  IMAGE_EXTENSION = "jpeg"
+  IMAGE_NAMING_PATTERN = "%06d.#{IMAGE_EXTENSION}" # see ffmpeg's file numbering.
+  TESSERACT_CONFIG_FILE = "./config/tesseract.config"
 
   def initialize(args = {})
-    @video_path = args[:video_path]
-    @image_extension = "jpeg"
-    @image_naming_pattern = "%06d.#{@image_extension}" # see ffmpeg's file numbering.
-    @tesseract_config_file = "./config/tesseract.config"
+    begin
+      video_path = args[:video_path]
+
+      video_coordinates = run(video_path)
+      yield video_coordinates
+
+    ensure
+      delete_images_dir(get_images_dir(video_path))
+    end
   end
 
-  def run
+  def run(video_path)
     begin
       video_coordinates = {}
 
-      images_dir = extract_images_per_second(@video_path, @image_naming_pattern)
-      images = get_images_list(images_dir)
+      images = extract_images_per_second(video_path, IMAGE_NAMING_PATTERN)
       images.each do |image_path|
         image_text = extract_text(image_path)
         coordinates = extract_coordinates(image_text)
@@ -59,7 +65,7 @@ class CoordinatesExtractor
         validate: false
       )
 
-      images_dir
+      get_images_list(images_dir)
     rescue => err
       delete_images_dir(images_dir)
       raise CoordinatesExtractionError, "Error extracting images for video: #{video_path}. #{err}"
@@ -68,7 +74,7 @@ class CoordinatesExtractor
 
   def extract_text(image_path)
     begin
-      RTesseract.new(image_path, config_file: @tesseract_config_file).to_s.strip
+      RTesseract.new(image_path, config_file: TESSERACT_CONFIG_FILE).to_s.strip
     rescue => err
       raise CoordinatesExtractionError, "Error extracting text for image: #{image_path}. #{err}"
     end
@@ -113,7 +119,7 @@ class CoordinatesExtractor
 
 private
   def create_images_dir(video_path)
-    dir = video_path.rpartition(".")[0]
+    dir = get_images_dir(video_path)
     unless Dir.exist?(dir)
       Dir.mkdir(dir)
     end
@@ -126,6 +132,10 @@ private
   end
 
   def get_images_list(images_dir)
-    Dir["#{images_dir}/*.#{@image_extension}"]
+    Dir["#{images_dir}/*.#{IMAGE_EXTENSION}"]
+  end
+
+  def get_images_dir(video_path)
+    video_path.rpartition(".")[0]
   end
 end
