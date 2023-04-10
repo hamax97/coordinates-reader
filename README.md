@@ -19,7 +19,7 @@ sudo apt install tesseract-ocr libtesseract-dev
 ```bash
 sudo apt install tesseract-ocr libtesseract-dev
 sudo apt install ffmpeg
- sudo apt install libvips42 # required for gem image_processing, required for displaying images.
+sudo apt install libvips42 # required for gem image_processing, required for displaying images.
 ```
 
 Tested with:
@@ -56,7 +56,9 @@ tesseract example/000038.jpg out --loglevel ALL tesseract.config
 ```
 
 Tesseract improving quality: https://tesseract-ocr.github.io/tessdoc/ImproveQuality.htmlhttps://tesseract-ocr.github.io/tessdoc/ImproveQuality.html#dictionaries-word-lists-and-patterns
+
 Tesseract config files: https://github.com/tesseract-ocr/tesseract/blob/main/doc/tesseract.1.asc#config-files-and-augmenting-with-user-data
+
 Tesseract patterns docs (look for the function read_pattern_list): https://github.com/tesseract-ocr/tesseract/blob/main/src/dict/trie.h
 
 
@@ -81,3 +83,18 @@ ffmpeg -i example.mp4 -vf fps=1 %06d.png
   - Lock the versions for each of the tools. Also the Gemfile.
   - Make the docker container expose the web service.
   - Upload the docker image to Dockerhub.
+- Apply filter to improve image quality:
+
+  ```python
+  # Leer el archivo de imagen
+  image = cv2.imread(input_file)
+
+  # Convertir la imagen a escala de grises
+  gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+  # Aplicar un umbral para mejorar la calidad del texto
+  threshold_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+  # Extraer el texto de la imagen utilizando pytesseract
+  extracted_text = pytesseract.image_to_string(threshold_image)
+  ```

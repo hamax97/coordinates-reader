@@ -1,11 +1,12 @@
-<h1>Videos processed</h1>
+<h1>Images and Coordinates for <%= @video.summary %></h1>
+
 <ul>
-<% @videos_processed.each do |video| %>
+<% @video.images.each do |image| %>
   <li>
-    <%= "#{video.name} - #{video.size}" %>
-    <% video.images.each do |image| %>
-      <%= image_tag image.image_file.representation({resize_to_limit: [100, 100]}) %>
-    <% end %>
+    <div>
+      <%= link_to image.name, image_path(image) %>
+      - Coordinates: <%= "#{image.latitude}, #{image.longitude}" %>
+    </div>
   </li>
 <% end %>
 </ul>
