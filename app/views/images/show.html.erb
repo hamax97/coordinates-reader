@@ -1,5 +1,7 @@
 <h1>Image <%= @image.name %></h1>
 
+<%= link_to 'Go Back', video_path(id: @image.video_id) %>
+
 <div>
   <h2>Coordinates: <%= "#{@image.latitude}, #{@image.longitude}" %></h2>
   <%= image_tag @image.image_file.representation({resize_to_limit: [800, 800]}) %>

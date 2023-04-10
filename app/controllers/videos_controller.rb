@@ -7,8 +7,10 @@ class VideosController < ApplicationController
   end
 
   def upload
-    # TODO: complete the 'show' view. List of images with coordinates next to them. Add copy to clipboard button to each value.
-    # TODO: add progress bar.
+    # TODO: delete images created by ffmpeg.
+    # TODO: fix issue with SQLite3 ... busy exception.
+    # TODO: Add copy to clipboard button to each coordinate.
+    # TODO: add progress bar when processing a video.
 
     begin
       video_file = video_params[:video_file]
@@ -47,8 +49,6 @@ class VideosController < ApplicationController
         # - read: https://discuss.rubyonrails.org/t/failed-write-transaction-upgrades-in-sqlite3/81480
       end
 
-      # TODO: delete images created by ffmpeg.
-
       redirect_to action: :extract_coordinates
 
     rescue ActiveRecord::RecordInvalid => invalid_video
@@ -77,9 +77,4 @@ private
     @coordinates_extraction_error = err
     render :error, status: :internal_server_error
   end
-
-  # TODO:
-  # - Create a dynamic view for each video processed.
-  #   - Show the list of images and their coordinates next to them.
-  #   - Eeach image item should have a link to a preview of the image.
 end

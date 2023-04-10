@@ -1,5 +1,7 @@
 <h1>Images and Coordinates for <%= @video.summary %></h1>
 
+<%= link_to 'Go Back', videos_path %>
+
 <ul>
 <% @video.images.each do |image| %>
   <li>
