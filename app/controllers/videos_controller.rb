@@ -7,11 +7,8 @@ class VideosController < ApplicationController
   end
 
   def upload
-    # TODO: fix issue with SQLite3 ... busy exception.
-    # - Seems like the issue raises when using ActiveStorage attach.
-    # - Is there any way to do a bulk attach?
-    # - Try using PostgreSQL: https://guides.rubyonrails.org/active_record_postgresql.html
-    # TODO: Add delete button to a video.
+    # TODO: Add CSS to views: https://www.bootrails.com/blog/rails-7-bootstrap-5-tutorial/
+    # TODO: Dockerize application.
     # TODO: Add copy to clipboard button to each coordinate.
     # TODO: add progress bar when processing a video.
 
@@ -26,10 +23,6 @@ class VideosController < ApplicationController
         video_coordinates.each do |image_path, image_info|
           image = save_image_in_db(@video, image_path, image_info)
           store_image(image, image_path, image_info[:image_name])
-
-          #break # TODO: Remove this break.
-          # TODO: Fix issue: SQLite3::BusyException: database is locked.
-          # - read: https://discuss.rubyonrails.org/t/failed-write-transaction-upgrades-in-sqlite3/81480
         end
       end
 
@@ -43,6 +36,12 @@ class VideosController < ApplicationController
 
   def show
     @video = Video.find(params[:id])
+  end
+
+  def destroy
+    Video.destroy(params[:id])
+
+    redirect_to action: :extract_coordinates, status: :see_other
   end
 
 private

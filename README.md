@@ -23,7 +23,6 @@ sudo apt install libvips42 # required for gem image_processing, required for dis
 sudo apt-get install postgresql-12 postgresql-client-12
 sudo service postgresql start
 sudo -u postgres createuser -s coordinates_reader -P # set password to: CoordinatesReader123*
-bin/rails db:create db:migrate
 ```
 
 Tested with:
@@ -39,7 +38,7 @@ Tested with:
 ## Setup app
 
 ```
-bin/rails db:migrate
+bin/rails db:create db:migrate
 bin/rails active_storage:install
 ```
 

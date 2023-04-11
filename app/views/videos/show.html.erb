@@ -1,6 +1,11 @@
 <h1>Images and Coordinates for <%= @video.summary %></h1>
 
 <%= link_to 'Go Back', videos_path %>
+<br>
+<%= link_to 'Delete all', video_path(@video), data: {
+  turbo_method: :delete,
+  turbo_confirm: "Are you sure?"
+} %>
 
 <ul>
 <% @video.images.each do |image| %>

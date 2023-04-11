@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "videos", to: "videos#extract_coordinates"
   post "videos", to: "videos#upload"
   get "videos/:id", to: "videos#show", as: :video
+  delete "videos/:id", to: "videos#destroy"
 
   get "images/:id", to: "images#show", as: :image
 end

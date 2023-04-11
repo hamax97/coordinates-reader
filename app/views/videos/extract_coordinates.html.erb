@@ -13,6 +13,10 @@
 <% @videos_processed.each do |video| %>
   <li>
     <%= link_to video.summary, video_path(video) %>
+    - <%= link_to 'Delete', video_path(video), data: {
+        turbo_method: :delete,
+        turbo_confirm: "Are you sure?"
+      } %>
   </li>
 <% end %>
 </ul>
