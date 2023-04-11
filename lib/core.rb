@@ -9,10 +9,8 @@ class CoordinatesExtractor
   IMAGE_NAMING_PATTERN = "%06d.#{IMAGE_EXTENSION}" # see ffmpeg's file numbering.
   TESSERACT_CONFIG_FILE = "./config/tesseract.config"
 
-  def initialize(args = {})
+  def initialize(video_path)
     begin
-      video_path = args[:video_path]
-
       video_coordinates = run(video_path)
       yield video_coordinates
 
