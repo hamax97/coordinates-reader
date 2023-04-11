@@ -24,9 +24,10 @@ class VideosController < ApplicationController
         @video = Video.create!(name: video_file.original_filename, size: get_video_size(video_file))
 
         video_coordinates.each do |image_path, image_info|
-          store_image(@video, image_path, image_info)
+          image = save_image_in_db(@video, image_path, image_info)
+          store_image(image, image_path, image_info[:image_name])
 
-          break # TODO: Remove this break.
+          #break # TODO: Remove this break.
           # TODO: Fix issue: SQLite3::BusyException: database is locked.
           # - read: https://discuss.rubyonrails.org/t/failed-write-transaction-upgrades-in-sqlite3/81480
         end
@@ -60,17 +61,19 @@ private
     render :error, status: :internal_server_error
   end
 
-  def store_image(video, image_path, image_info)
-    image_name = image_path.rpartition("/")[-1]
+  def save_image_in_db(video, image_path, image_info)
+    image_name = image_info[:image_name]
     lat, long = image_info[:coordinates].map { |x| x.to_f }
     image_text = image_info[:image_text]
     image_size = File.size(image_path)
 
     # TODO: change lat, long to be strings, the match might not always be a float.
-    image = video.images.create!(
+    video.images.create!(
       name: image_name, size: image_size, latitude: lat, longitude: long, extracted_text: image_text
     )
+  end
 
+  def store_image(image, image_path, image_name)
     image.image_file.attach(
       io: File.open(image_path),
       filename: image_name,

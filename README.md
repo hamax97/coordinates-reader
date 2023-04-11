@@ -20,6 +20,10 @@ sudo apt install tesseract-ocr libtesseract-dev
 sudo apt install tesseract-ocr libtesseract-dev
 sudo apt install ffmpeg
 sudo apt install libvips42 # required for gem image_processing, required for displaying images.
+sudo apt-get install postgresql-12 postgresql-client-12
+sudo service postgresql start
+sudo -u postgres createuser -s coordinates_reader -P # set password to: CoordinatesReader123*
+bin/rails db:create db:migrate
 ```
 
 Tested with:
@@ -27,7 +31,7 @@ Tested with:
 - Tesseract version 4.1.1
 - FFMPEG version 4.2.7-0ubuntu0.1
 - Ruby version 3.2.0
-- SQLite 3 - 3.31.1
+- PostgreSQL 12
 - Rails
 
 # How to Use

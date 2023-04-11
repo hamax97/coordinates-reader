@@ -25,10 +25,12 @@ class CoordinatesExtractor
 
       images = extract_images_per_second(video_path, IMAGE_NAMING_PATTERN)
       images.each do |image_path|
+        image_name = image_path.rpartition("/")[-1]
         image_text = extract_text(image_path)
         coordinates = extract_coordinates(image_text)
 
         video_coordinates[image_path] = {
+          image_name: image_name,
           coordinates: coordinates,
           image_text: image_text
         }
