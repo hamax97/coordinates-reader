@@ -7,7 +7,6 @@ class VideosController < ApplicationController
   end
 
   def upload
-    # TODO: Add CSS to views: https://www.bootrails.com/blog/rails-7-bootstrap-5-tutorial/
     # TODO: Dockerize application.
     # TODO: Add copy to clipboard button to each coordinate.
     # TODO: add progress bar when processing a video.

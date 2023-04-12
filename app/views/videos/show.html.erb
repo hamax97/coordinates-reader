@@ -1,19 +1,21 @@
-<h1>Images and Coordinates for <%= @video.summary %></h1>
+<div class="align-center">
+  <h1>Images and Coordinates for <%= @video.name %></h1>
 
-<%= link_to 'Go Back', videos_path %>
-<br>
-<%= link_to 'Delete all', video_path(@video), data: {
-  turbo_method: :delete,
-  turbo_confirm: "Are you sure?"
-} %>
+  <%= link_to 'Go Back', videos_path %>
+  <br>
+  <%= link_to 'Delete all', video_path(@video), data: {
+    turbo_method: :delete,
+    turbo_confirm: "Are you sure?"
+  } %>
 
-<ul>
-<% @video.images.each do |image| %>
-  <li>
-    <div>
+  <br>
+
+  <ul class="align-left">
+  <% @video.images.each do |image| %>
+    <li>
       <%= link_to image.name, image_path(image) %>
-      - Coordinates: <%= "#{image.latitude}, #{image.longitude}" %>
-    </div>
-  </li>
-<% end %>
-</ul>
+      <span>- Coordinates: <%= "#{image.latitude}, #{image.longitude}" %></span>
+    </li>
+  <% end %>
+  </ul>
+</div>

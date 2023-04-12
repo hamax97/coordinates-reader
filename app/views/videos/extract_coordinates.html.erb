@@ -1,22 +1,24 @@
-<h1>Extract coordinates</h1>
-<p>Select video</p>
+<div class="align-center">
+  <h1>Extract coordinates</h1>
+  <p>Select video</p>
 
-<%= form_with model: @video do |form| %>
-  <%= form.file_field :video_file %>
-  <%= form.submit %>
-<% end %>
+  <%= form_with model: @video do |form| %>
+    <%= form.file_field :video_file %>
+    <%= form.submit 'Extract' %>
+  <% end %>
 
-<br>
+  <br>
 
-<h1>Videos processed</h1>
-<ul>
-<% @videos_processed.each do |video| %>
-  <li>
-    <%= link_to video.summary, video_path(video) %>
-    - <%= link_to 'Delete', video_path(video), data: {
-        turbo_method: :delete,
-        turbo_confirm: "Are you sure?"
-      } %>
-  </li>
-<% end %>
-</ul>
+  <h1>Videos processed</h1>
+  <ul class="align-left">
+  <% @videos_processed.each do |video| %>
+    <li>
+      <%= link_to video.summary, video_path(video) %>
+      - <%= link_to 'Delete', video_path(video), data: {
+          turbo_method: :delete,
+          turbo_confirm: "Are you sure?"
+        } %>
+    </li>
+  <% end %>
+  </ul>
+</div>

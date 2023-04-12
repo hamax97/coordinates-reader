@@ -13,3 +13,21 @@
  *= require_tree .
  *= require_self
  */
+
+h1, h2, p, a, span {
+    font-family: Verdana, sans-serif;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.align-left {
+    display: inline-block;
+    text-align: left;
+}
+
+/* align bulletpoints as well */
+ul {
+    list-style-position: inside;
+}
