@@ -7,7 +7,6 @@ class CoordinatesExtractor
 
   IMAGE_EXTENSION = "jpeg"
   IMAGE_NAMING_PATTERN = "%06d.#{IMAGE_EXTENSION}" # see ffmpeg's file numbering.
-  TESSERACT_CONFIG_FILE = "./config/tesseract.config"
 
   def initialize(video_path)
     begin
@@ -74,7 +73,7 @@ class CoordinatesExtractor
 
   def extract_text(image_path)
     begin
-      RTesseract.new(image_path, config_file: TESSERACT_CONFIG_FILE).to_s.strip
+      RTesseract.new(image_path).to_s.strip
     rescue => err
       raise CoordinatesExtractionError, "Error extracting text for image: #{image_path}. #{err}"
     end
