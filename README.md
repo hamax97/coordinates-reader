@@ -8,12 +8,12 @@ Reads coordinates given in a video and produces a set of geo-referenced images, 
 sudo apt-get install apt-transport-https
 
 # Add this to the /etc/apt/sources.list
-deb https://notesalexp.org/tesseract-ocr5/focal/ focal main
+echo "deb https://notesalexp.org/tesseract-ocr5/bullseye/ bullseye main" >> /etc/apt/sources.list
 
 wget -O - https://notesalexp.org/debian/alexp_key.asc | sudo apt-key add -
 sudo apt-get update
 
-sudo apt install tesseract-ocr libtesseract-dev
+apt-get install -y tesseract-ocr=5.3.0-1 libtesseract-dev=5.3.0-1
 ```
 
 ```bash
@@ -27,11 +27,11 @@ sudo -u postgres createuser -s coordinates_reader -P # set password to: Coordina
 
 Tested with:
 
-- Tesseract version 4.1.1
+- Tesseract version 5.3.0
 - FFMPEG version 4.2.7-0ubuntu0.1
 - Ruby version 3.2.0
-- PostgreSQL 12
-- Rails
+- PostgreSQL 12, 13?
+- Rails 7.0.4
 
 # How to Use
 
@@ -76,6 +76,20 @@ ffmpeg -i example.mp4 -vframes 1 000000.png
 
 ```bash
 ffmpeg -i example.mp4 -vf fps=1 %06d.png
+```
+
+# Docker
+
+Build image:
+
+```bash
+docker build -t coordinates-reader .
+```
+
+Run container from terminal:
+
+```bash
+docker run -d -e SECRET_KEY_BASE=$(bin/rails secret) -p 3000:3000 -h coordinates-reader --name coordinates-reader coordinates-reader:latest
 ```
 
 # TODOs

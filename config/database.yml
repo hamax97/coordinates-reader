@@ -1,9 +1,9 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  username: coordinates_reader
-  password: CoordinatesReader123*
-  host: localhost
+  username: <%= ENV.fetch("POSTGRES_USER") { "coordinates_reader" } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "CoordinatesReader123*" } %>
+  host: <%= ENV.fetch("POSTGRES_HOST") { "localhost" } %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
