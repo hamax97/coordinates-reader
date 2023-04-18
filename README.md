@@ -6,6 +6,49 @@ the video.
 
 ![coordinates-reader.png](./docs/coordinates-reader.png)
 
+<!-- TOC -->
+
+- [Coordinates Reader](#coordinates-reader)
+    - [Run with Docker](#run-with-docker)
+    - [Build Docker image](#build-docker-image)
+    - [Setup development environment](#setup-development-environment)
+        - [Start application](#start-application)
+    - [Run Tesseract manually](#run-tesseract-manually)
+    - [Run FFMPEG manually](#run-ffmpeg-manually)
+
+<!-- /TOC -->
+
+## Run with Docker
+
+Pull image:
+
+```bash
+docker pull hamax97/coordinates-reader
+```
+
+Run in terminal:
+
+```bash
+docker run -d -e SECRET_KEY_BASE=$(bin/rails secret) -p 3000:3000 -h coordinates-reader --name coordinates-reader coordinates-reader:latest
+```
+
+TODO: Run in Docker Desktop.
+
+## Build Docker image
+
+Build image:
+
+```bash
+docker build -t coordinates-reader .
+```
+
+Tag and push:
+
+```bash
+docker tag <image_id> hamax97/coordinates-reader:<version>
+docker push hamax97/coordinates-reader:<version>
+```
+
 ## Setup development environment
 
 Developed with:
@@ -62,37 +105,6 @@ bin/rails db:create db:migrate
 bin/rails active_storage:install
 
 bin/rails server
-```
-
-## Run with Docker
-
-Pull image:
-
-```bash
-docker pull hamax97/coordinates-reader
-```
-
-Run in terminal:
-
-```bash
-docker run -d -e SECRET_KEY_BASE=$(bin/rails secret) -p 3000:3000 -h coordinates-reader --name coordinates-reader coordinates-reader:latest
-```
-
-TODO: Run in Docker Desktop.
-
-## Build Docker image
-
-Build image:
-
-```bash
-docker build -t coordinates-reader .
-```
-
-Tag and push:
-
-```bash
-docker tag <image_id> hamax97/coordinates-reader:<version>
-docker push hamax97/coordinates-reader:<version>
 ```
 
 ## Run Tesseract manually
