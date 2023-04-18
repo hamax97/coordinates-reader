@@ -1,7 +1,10 @@
 # Coordinates Reader
 
-Reads a video that contains coordinates updated per second, and produces a set of images with their coordinates,
-one image per second.
+Ruby on Rails webapp that reads a video that contains coordinates as text, updated per second, and produces
+a set of images, one per each coordinate change, with their corresponding coordinates by reading the text in
+the video.
+
+![coordinates-reader.png](./docs/coordinates-reader.png)
 
 ## Setup development environment
 
@@ -11,8 +14,8 @@ Developed with:
 - Ruby 3.2.0
 - Rails 7.0.4
 - PostgreSQL 12
-- Tesseract version 5.3.0
-- FFMPEG version 7:4.2.7-0ubuntu0.1
+- Text extraction: Tesseract version 5.3.0
+- Video processing: FFMPEG version 7:4.2.7-0ubuntu0.1
 
 Install Tessearct:
 
