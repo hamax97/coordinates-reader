@@ -1,71 +1,116 @@
 # Coordinates Reader
-Reads coordinates given in a video and produces a set of geo-referenced images, one image per second.
 
-# Dependencies
+Reads a video that contains coordinates updated per second, and produces a set of images with their coordinates,
+one image per second.
+
+## Setup development environment
+
+Developed with:
+
+- Ubuntu 20.04
+- Ruby 3.2.0
+- Rails 7.0.4
+- PostgreSQL 12
+- Tesseract version 5.3.0
+- FFMPEG version 7:4.2.7-0ubuntu0.1
+
+Install Tessearct:
 
 ```bash
-# Tesseract
-sudo apt-get install apt-transport-https
-
-# Add this to the /etc/apt/sources.list
-echo "deb https://notesalexp.org/tesseract-ocr5/bullseye/ bullseye main" >> /etc/apt/sources.list
+echo "deb https://notesalexp.org/tesseract-ocr5/focal/ focal main" >> /etc/apt/sources.list
 
 wget -O - https://notesalexp.org/debian/alexp_key.asc | sudo apt-key add -
 sudo apt-get update
 
-apt-get install -y tesseract-ocr=5.3.0-1 libtesseract-dev=5.3.0-1
+sudo apt-get install -y tesseract-ocr=5.3.0-1 libtesseract-dev=5.3.0-1
 ```
+
+Install FFMPEG:
 
 ```bash
-sudo apt install tesseract-ocr libtesseract-dev
-sudo apt install ffmpeg
-sudo apt install libvips42 # required for gem image_processing, required for displaying images.
+sudo apt-get -y install ffmpeg=7:4.2.7-0ubuntu0.1
+
+```
+
+Install libraries used by rails for image processing:
+
+```bash
+# required for gem image_processing, which required for displaying images.
+sudo apt-get -y install libvips42
+```
+
+Install PostgreSQL and set the password for user `coordinates_reader` to `CoordinatesReader123*`:
+
+```bash
 sudo apt-get install postgresql-12 postgresql-client-12
+
+# set password to: CoordinatesReader123*
+sudo -u postgres createuser -s coordinates_reader -P
+```
+
+### Start application
+
+Please note that `bin/rails db:create db:migrate` and `bin/rails active_storage:install` are run only
+once to initliaze the DB. After that, starting the PostgreSQL service and the rails server will work.
+
+```bash
 sudo service postgresql start
-sudo -u postgres createuser -s coordinates_reader -P # set password to: CoordinatesReader123*
-```
-
-Tested with:
-
-- Tesseract version 5.3.0
-- FFMPEG version 4.2.7-0ubuntu0.1
-- Ruby version 3.2.0
-- PostgreSQL 12, 13?
-- Rails 7.0.4
-
-# How to Use
-
-## Setup app
-
-```
 bin/rails db:create db:migrate
 bin/rails active_storage:install
+
+bin/rails server
 ```
 
-## Run
+## Run with Docker
 
-Run:
+Pull image:
 
 ```bash
-lib/cli.rb -v ./assets/example.mp4
+docker pull hamax97/coordinates-reader
 ```
 
-Tesseract
+Run in terminal:
 
-```
-tesseract -c load_system_dawg=0 -c load_freq_dawg=0 example/000040.png out
-tesseract -c load_system_dawg=0 -c load_freq_dawg=0 -c tessedit_char_whitelist="0123456789. -+" example/000050.jpg out
-tesseract example/000038.jpg out --loglevel ALL tesseract.config
+```bash
+docker run -d -e SECRET_KEY_BASE=$(bin/rails secret) -p 3000:3000 -h coordinates-reader --name coordinates-reader coordinates-reader:latest
 ```
 
-Tesseract improving quality: https://tesseract-ocr.github.io/tessdoc/ImproveQuality.htmlhttps://tesseract-ocr.github.io/tessdoc/ImproveQuality.html#dictionaries-word-lists-and-patterns
+TODO: Run in Docker Desktop.
 
-Tesseract config files: https://github.com/tesseract-ocr/tesseract/blob/main/doc/tesseract.1.asc#config-files-and-augmenting-with-user-data
+## Build Docker image
 
-Tesseract patterns docs (look for the function read_pattern_list): https://github.com/tesseract-ocr/tesseract/blob/main/src/dict/trie.h
+Build image:
+
+```bash
+docker build -t coordinates-reader .
+```
+
+Tag and push:
+
+```bash
+docker tag <image_id> hamax97/coordinates-reader:<version>
+docker push hamax97/coordinates-reader:<version>
+```
+
+## Run Tesseract manually
+
+```bash
+tesseract -c load_system_dawg=0 -c load_freq_dawg=0 <path_to_image> out
+tesseract -c load_system_dawg=0 -c load_freq_dawg=0 -c tessedit_char_whitelist="0123456789. -+" <path_to_image> out
+tesseract <path_to_image> out --loglevel ALL tesseract.config
+```
+
+Useful links:
+
+- [Tesseract improving quality](https://tesseract-ocr.github.io/tessdoc/ImproveQuality.htmlhttps://tesseract-ocr.github.io/tessdoc/ImproveQuality.html#dictionaries-word-lists-and-patterns).
+
+- [Tesseract config files](https://github.com/tesseract-ocr/tesseract/blob/main/doc/tesseract.1.asc#config-files-and-augmenting-with-user-data)
+
+- [Tesseract patterns docs (look for the function read_pattern_list)](https://github.com/tesseract-ocr/tesseract/blob/main/src/dict/trie.h)
 
 
-# FFMPEG Reference
+## Run FFMPEG manually
+
 - First frame:
 
 ```bash
@@ -77,41 +122,3 @@ ffmpeg -i example.mp4 -vframes 1 000000.png
 ```bash
 ffmpeg -i example.mp4 -vf fps=1 %06d.png
 ```
-
-# Docker
-
-Build image:
-
-```bash
-docker build -t coordinates-reader .
-```
-
-Run container from terminal:
-
-```bash
-docker run -d -e SECRET_KEY_BASE=$(bin/rails secret) -p 3000:3000 -h coordinates-reader --name coordinates-reader coordinates-reader:latest
-```
-
-# TODOs
-
-- Support receiving a folder with multiple videos in CLI.
-- Add a simple web service to do the processing in a set of videos (or video per video maybe.)
-- Install FFMPEG and Tesseract in a docker container together with Ruby.
-  - Lock the versions for each of the tools. Also the Gemfile.
-  - Make the docker container expose the web service.
-  - Upload the docker image to Dockerhub.
-- Apply filter to improve image quality:
-
-  ```python
-  # Leer el archivo de imagen
-  image = cv2.imread(input_file)
-
-  # Convertir la imagen a escala de grises
-  gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-  # Aplicar un umbral para mejorar la calidad del texto
-  threshold_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-
-  # Extraer el texto de la imagen utilizando pytesseract
-  extracted_text = pytesseract.image_to_string(threshold_image)
-  ```
