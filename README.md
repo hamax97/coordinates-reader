@@ -102,7 +102,6 @@ once to initliaze the DB. After that, starting the PostgreSQL service and the ra
 ```bash
 sudo service postgresql start
 bin/rails db:create db:migrate
-bin/rails active_storage:install
 
 bin/rails server
 ```
