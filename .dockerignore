@@ -35,3 +35,9 @@
 /config/master.key
 
 .ignore
+
+/spec
+/test
+.rspec
+
+/bundle
