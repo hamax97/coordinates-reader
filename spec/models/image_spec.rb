@@ -22,7 +22,7 @@ RSpec.describe Image, type: :model do
   end
 
   describe "#summary" do
-    it "should include the name and size in mb" do
+    it "should include the name and size in MB" do
       name = "fake_name.jpg"
       size_in_bytes = 10240
       image = Image.new(name: name, size: size_in_bytes)
