@@ -7,7 +7,6 @@ class VideosController < ApplicationController
   end
 
   def upload
-    # TODO: Dockerize application.
     # TODO: Add copy to clipboard button to each coordinate.
     # TODO: add progress bar when processing a video.
 
