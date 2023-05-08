@@ -24,6 +24,7 @@ class VideosController < ApplicationController
         end
       end
 
+      headers["video-id"] = @video.id
       redirect_to action: :extract_coordinates
 
     rescue => err
@@ -33,7 +34,11 @@ class VideosController < ApplicationController
   end
 
   def show
-    @video = Video.find(params[:id])
+    begin
+      @video = Video.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => err
+      render_error err, status: :not_found
+    end
   end
 
   def destroy
@@ -53,9 +58,10 @@ private
     return "#{video_file.size / to_kb / to_mb} MB"
   end
 
-  def render_error(err)
+  def render_error(err, status: :internal_server_error)
     @coordinates_extraction_error = err
-    render :error, status: :internal_server_error
+    @err_status_code = status
+    render :error, status: status
   end
 
   def save_image_in_db(video, image_path, image_info)

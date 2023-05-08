@@ -9,8 +9,7 @@ RSpec.describe Image, type: :model do
     it { should_not be_valid }
 
     it "should raise when not associated to a video" do
-      expect { Image.create!(name: "fake_name.jpg") }.to
-        raise_error(ActiveRecord::RecordInvalid, /Video must exist/)
+      expect { Image.create!(name: "fake_name.jpg") }.to raise_error(ActiveRecord::RecordInvalid, /Video must exist/)
     end
 
     it "should create and save to db when given at least a name" do
