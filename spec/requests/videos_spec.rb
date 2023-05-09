@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Coordinates extraction", type: :request do
+RSpec.describe "Videos", type: :request do
   describe "GET /videos" do
     it "shows the already processed videos" do
       videos = [
